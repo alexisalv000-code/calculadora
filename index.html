@@ -54,6 +54,7 @@ td,th{border:1px solid var(--bd);padding:6px;text-align:left}
 <div><label>Tope cesantía (años)</label><input id="tope" type="number" value="25" min="1" step="1"></div>
 </div>
 <label class="chk"><input id="trunc" type="checkbox" checked> Truncar sueldo promediado a 2 decimales (como en clase)</label>
+<label class="chk"><input id="novac" type="checkbox" checked> No tuvo vacaciones en el año del retiro (se pagan proporcionales)</label>
 <button onclick="calc()">Calcular</button>
 <div id="err" class="err"></div>
 </div>
@@ -108,7 +109,7 @@ function calc(){
  const t4=dec(d2.getMonth()>=6?new Date(Y,6,1):new Date(Y-1,6,1));
  const an=addM(d1,y*12), rv=span(an,d2), ddv=rv.d+(an.getDate()===1?1:0), dv=Math.min(360,rv.tm*30+ddv);
  const vd=y>=4?20:y>=3?15:y>=2?12:10;
- const fac=r2(dv/360*vd), vac=r2(fac*dord);
+ const nv=$("novac").checked, fac=r2(dv/360*vd), vac=nv?r2(fac*dord):0;
  const tot=r2(sub+t3.val+t4.val+vac);
  const nom=$("nom").value.trim().replace(/</g,"&lt;");
  const dtxt=(x,leg)=>`Período legal: ${leg}<br>Período trabajado: del ${fd(x.st)} al ${fd(d2)}<br>TDT (total de días trabajados) = (${x.r.tm} meses × 30) + ${x.dd} días + 1 = <em>${x.tdt} días</em><br>Factor = TDT / 360 × SOM = (${x.tdt} / 360) × ${f(mens)} = <em>${L(x.val)}</em>`;
@@ -123,7 +124,7 @@ function calc(){
  <div class="card"><h2>Treceavo, catorceavo y vacaciones proporcionales</h2>
  <div class="step"><b>6. Treceavo mes proporcional (décimo tercero)</b><div>${dtxt(t3,"1 de enero al 31 de diciembre")}</div></div>
  <div class="step"><b>7. Catorceavo mes proporcional (décimo cuarto)</b><div>${dtxt(t4,"1 de julio al 30 de junio")}</div></div>
- <div class="step"><b>8. Vacaciones proporcionales</b><div>Período trabajado desde el último aniversario: del ${fd(an)} al ${fd(d2)}<br>Días = (${rv.tm} meses × 30) + ${ddv} días = <em>${dv} días</em><br>Según tabla, ${y} año(s) trabajados = <em>${vd} días</em> de vacaciones<br>Factor = (${dv} / 360) × ${vd} = <em>${f(fac)}</em><br>Vacaciones = Factor × SOD = ${f(fac)} × ${f(dord)} = <em>${L(vac)}</em></div></div>
+ <div class="step"><b>8. Vacaciones proporcionales</b><div>${!nv?`Tomó sus vacaciones en el año del retiro: <em>NO APLICA</em> pago de vacaciones proporcionales = <em>${L(0)}</em>`:`Período trabajado desde el último aniversario: del ${fd(an)} al ${fd(d2)}<br>Días = (${rv.tm} meses × 30) + ${ddv} días = <em>${dv} días</em><br>Según tabla, ${y} año(s) trabajados = <em>${vd} días</em> de vacaciones<br>Factor = (${dv} / 360) × ${vd} = <em>${f(fac)}</em><br>Vacaciones = Factor × SOD = ${f(fac)} × ${f(dord)} = <em>${L(vac)}</em>`}</div></div>
  <div class="total"><span>Total general a pagar</span><strong>${L(tot)}</strong></div>
  <div class="note" style="margin-top:8px">Prestaciones ${L(sub)} + Treceavo ${L(t3.val)} + Catorceavo ${L(t4.val)} + Vacaciones ${L(vac)}</div></div>`;
 }
